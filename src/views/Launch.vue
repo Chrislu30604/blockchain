@@ -11,7 +11,12 @@
               <template>Fill the form</template>
             </div>
             <v-form>
-              <v-text-field v-model="user.name" light="light" prepend-icon="person" label="Beneficiary and Sponsor"></v-text-field>
+              <v-text-field
+                v-model="user.name"
+                light="light"
+                prepend-icon="person"
+                label="Beneficiary and Sponsor"
+              ></v-text-field>
               <v-text-field
                 v-model="user.email"
                 v-validate="'email'"
@@ -39,7 +44,28 @@
                 label="Estimated point"
                 type="text"
               ></v-text-field>
-              <datetime type="datetime" v-model="user.date"></datetime>
+              <v-menu
+                v-model="menu"
+                :close-on-content-click="false"
+                :nudge-right="40"
+                lazy
+                transition="scale-transition"
+                offset-y
+                full-width
+                min-width="290px"
+              >
+                <template v-slot:activator="{ on }">
+                  <v-text-field
+                    v-model="date"
+                    slot="activator"
+                    label="End time"
+                    prepend-icon="date_range"
+                    readonly
+                    v-on="on"
+                  ></v-text-field>
+                </template>
+                <v-date-picker v-model="date" @input="menu = false"></v-date-picker>
+              </v-menu>
               <v-btn
                 @click.prevent
                 block="block"
@@ -47,8 +73,9 @@
                 color="cyan"
                 class="white--text"
                 type="submit"
-              >Submit
-              <v-icon right dark>cloud_upload</v-icon>
+              >
+                Submit
+                <v-icon right dark>cloud_upload</v-icon>
               </v-btn>
             </v-form>
           </v-card-text>
@@ -70,25 +97,28 @@ export default {
   data() {
     return {
       user: {
-        name: '',
-        email: '',
-        password: '',
-        dollars: '',
-        date: '',
+        name: "",
+        email: "",
+        password: "",
+        dollars: "",
+        date: "",
+        endtime: null
       },
-      options: {}
+      options: {},
+      menu2: false,
+      date: new Date().toISOString().substr(0, 10),
     };
   },
 
   methods: {
-      submit() {
-          this.$validator.validateAll().then((result) => {
-              if(result) {
-                  // submit
-              }
-          });
-      },
-  },
+    submit() {
+      this.$validator.validateAll().then(result => {
+        if (result) {
+          // submit
+        }
+      });
+    }
+  }
 };
 </script>
 
