@@ -12,14 +12,18 @@
             </div>
             <v-form>
               <v-text-field
+                v-validate="'required|max:20'"
+                data-vv-name="name"
+                :error-messages="errors.collect('name')"
                 v-model="user.name"
                 light="light"
                 prepend-icon="person"
                 label="Beneficiary and Sponsor"
+                required
               ></v-text-field>
               <v-text-field
                 v-model="user.email"
-                v-validate="'email'"
+                v-validate="'required|email'"
                 data-vv-name="email"
                 :error-messages="errors.collect('email')"
                 light="light"
@@ -29,6 +33,9 @@
               ></v-text-field>
               <v-text-field
                 v-model="user.password"
+                v-validate="'required|min:6'"
+                data-vv-name="password"
+                :error-messages="errors.collect('password')"
                 light="light"
                 prepend-icon="lock"
                 label="Password"
@@ -56,7 +63,7 @@
               >
                 <template v-slot:activator="{ on }">
                   <v-text-field
-                    v-model="date"
+                    v-model="user.enddate"
                     slot="activator"
                     label="End time"
                     prepend-icon="date_range"
@@ -64,8 +71,22 @@
                     v-on="on"
                   ></v-text-field>
                 </template>
-                <v-date-picker v-model="date" @input="menu = false"></v-date-picker>
+                <v-date-picker
+                  v-model="user.date"
+                  @input="menu = false"
+                  :min="today"
+                ></v-date-picker>
               </v-menu>
+              <v-textarea
+                prepend-icon="description"
+                background-color="#F5F5F5"
+                name="Description"
+                box
+                label="Description"
+                flat
+                v-model="user.description"
+              ></v-textarea>
+
               <v-btn
                 @click.prevent
                 block="block"
@@ -101,12 +122,12 @@ export default {
         email: "",
         password: "",
         dollars: "",
-        date: "",
-        endtime: null
+        enddate: new Date().toISOString().substr(0, 10),
+        description: "",
       },
       options: {},
-      menu2: false,
-      date: new Date().toISOString().substr(0, 10),
+      menu: false,
+      today: new Date().toISOString().substr(0, 10),
     };
   },
 
@@ -114,10 +135,25 @@ export default {
     submit() {
       this.$validator.validateAll().then(result => {
         if (result) {
-          // submit
+          // ajax
+          const url = "http://127.0.0.1:8081/launch/propose";
+          let obj = this.user;
+          this.axios.post(url, {
+            name: obj.name,
+            email: obj.email,
+            password: obj.password,
+            dollars: obj.dollars,
+            enddate: obj.enddate,
+            description: obj.description,
+          }).then(function (response) {
+            console.log(response);
+          }).catch(function (error) {
+            console.log(error);
+          });
+          
         }
       });
-    }
+    },
   }
 };
 </script>
